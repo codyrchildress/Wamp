@@ -45,7 +45,7 @@ export function Header() {
   return (
     <header className={styles.header}>
       <div className={styles.left}>
-        <h1 className={styles.logo}>Mac2</h1>
+        <h1 className={styles.logo}>Wamp</h1>
         <div className={styles.powerSection}>
           {isRunning ? (
             <button className={`${styles.powerBtn} ${styles.on}`} onClick={stop}>

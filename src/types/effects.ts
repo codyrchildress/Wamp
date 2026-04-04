@@ -6,7 +6,8 @@ export type EffectType =
   | 'tremolo'
   | 'eq'
   | 'compressor'
-  | 'volume';
+  | 'volume'
+  | 'pitchshifter';
 
 export interface ParamDescriptor {
   name: string;

@@ -7,6 +7,7 @@ import { Tremolo } from './Tremolo';
 import { EQ } from './EQ';
 import { Compressor } from './Compressor';
 import { Volume } from './Volume';
+import { PitchShifter } from './PitchShifter';
 
 export function createEffect(ctx: AudioContext, type: EffectType): EffectNode {
   switch (type) {
@@ -18,6 +19,7 @@ export function createEffect(ctx: AudioContext, type: EffectType): EffectNode {
     case 'eq': return new EQ(ctx);
     case 'compressor': return new Compressor(ctx);
     case 'volume': return new Volume(ctx);
+    case 'pitchshifter': return new PitchShifter(ctx);
   }
 }
 
@@ -65,6 +67,12 @@ const PARAM_DESCRIPTORS: Record<EffectType, ParamDescriptor[]> = {
   volume: [
     { name: 'gain', label: 'Volume', min: 0, max: 150, default: 100, step: 1, unit: '%' },
   ],
+  pitchshifter: [
+    { name: 'pitch', label: 'Pitch', min: -24, max: 24, default: 0, step: 1, unit: 'st' },
+    { name: 'fine', label: 'Fine', min: -50, max: 50, default: 0, step: 1, unit: 'ct' },
+    { name: 'formant', label: 'Formant', min: -12, max: 12, default: 0, step: 1, unit: 'st' },
+    { name: 'mix', label: 'Mix', min: 0, max: 100, default: 100, step: 1, unit: '%' },
+  ],
 };
 
 export function getParamDescriptors(type: EffectType): ParamDescriptor[] {
@@ -80,8 +88,9 @@ export const EFFECT_LABELS: Record<EffectType, string> = {
   eq: 'EQ',
   compressor: 'Compressor',
   volume: 'Volume',
+  pitchshifter: 'Pitch Shifter',
 };
 
 export const ALL_EFFECT_TYPES: EffectType[] = [
-  'distortion', 'delay', 'reverb', 'chorus', 'tremolo', 'eq', 'compressor', 'volume',
+  'distortion', 'delay', 'reverb', 'chorus', 'tremolo', 'eq', 'compressor', 'volume', 'pitchshifter',
 ];

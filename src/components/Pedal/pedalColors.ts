@@ -65,4 +65,11 @@ export const PEDAL_COLORS: Record<EffectType, PedalColor> = {
     led: '#66ff66',
     text: '#f0e8d8',
   },
+  pitchshifter: {
+    bg: 'linear-gradient(145deg, #8c1a6a, #5c0d42)',
+    accent: '#e04da6',
+    knob: '#e04da6',
+    led: '#ff66cc',
+    text: '#ffccee',
+  },
 };
