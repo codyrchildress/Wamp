@@ -1,4 +1,8 @@
-# React + TypeScript + Vite
+# Wamp - Audio Effects Pedalboard
+
+[![Demo Video](https://img.youtube.com/vi/9HDp8PTJqVc/maxresdefault.jpg)](https://www.youtube.com/watch?v=9HDp8PTJqVc)
+
+## React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
