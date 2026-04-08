@@ -73,6 +73,56 @@ export const FACTORY_PRESETS: Preset[] = [
       { type: 'volume', bypassed: false, params: { gain: 100 } },
     ],
   },
+  {
+    id: 'factory-demon',
+    name: 'Demon Voice',
+    isFactory: true,
+    chain: [
+      { type: 'pitchshifter', bypassed: false, params: { pitch: -12, fine: 0, formant: -6, mix: 85 } },
+      { type: 'growl', bypassed: false, params: { growl: 85, sub: 70, tone: 35, mix: 75 } },
+      { type: 'distortion', bypassed: false, params: { drive: 40, tone: 2000, level: 60, mode: 2 } },
+      { type: 'reverb', bypassed: false, params: { decay: 3, mix: 35, brightness: 30 } },
+      { type: 'volume', bypassed: false, params: { gain: 100 } },
+    ],
+  },
+  {
+    id: 'factory-creature',
+    name: 'Creature',
+    isFactory: true,
+    chain: [
+      { type: 'pitchshifter', bypassed: false, params: { pitch: -7, fine: -20, formant: -4, mix: 90 } },
+      { type: 'growl', bypassed: false, params: { growl: 60, sub: 40, tone: 55, mix: 70 } },
+      { type: 'chorus', bypassed: false, params: { rate: 2, depth: 70, mix: 40 } },
+      { type: 'reverb', bypassed: false, params: { decay: 2, mix: 25, brightness: 45 } },
+      { type: 'volume', bypassed: false, params: { gain: 100 } },
+    ],
+  },
+  {
+    id: 'factory-alien',
+    name: 'Alien',
+    isFactory: true,
+    chain: [
+      { type: 'ringmod', bypassed: false, params: { freq: 180, depth: 70, wave: 0 } },
+      { type: 'pitchshifter', bypassed: false, params: { pitch: 5, fine: 30, formant: 8, mix: 75 } },
+      { type: 'bitcrusher', bypassed: false, params: { bits: 10, rate: 60, crush: 40 } },
+      { type: 'delay', bypassed: false, params: { time: 200, feedback: 45, mix: 30 } },
+      { type: 'reverb', bypassed: false, params: { decay: 2.5, mix: 30, brightness: 60 } },
+      { type: 'volume', bypassed: false, params: { gain: 100 } },
+    ],
+  },
+  {
+    id: 'factory-dragon',
+    name: 'Dragon',
+    isFactory: true,
+    chain: [
+      { type: 'pitchshifter', bypassed: false, params: { pitch: -18, fine: 0, formant: -8, mix: 80 } },
+      { type: 'growl', bypassed: false, params: { growl: 95, sub: 85, tone: 25, mix: 90 } },
+      { type: 'distortion', bypassed: false, params: { drive: 65, tone: 1500, level: 55, mode: 1 } },
+      { type: 'bitcrusher', bypassed: false, params: { bits: 6, rate: 35, crush: 50 } },
+      { type: 'reverb', bypassed: false, params: { decay: 4, mix: 40, brightness: 25 } },
+      { type: 'volume', bypassed: false, params: { gain: 100 } },
+    ],
+  },
 ];
 
 export function loadUserPresets(): Preset[] {
