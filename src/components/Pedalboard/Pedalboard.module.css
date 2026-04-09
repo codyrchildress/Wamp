@@ -1,8 +1,6 @@
 .board {
-  flex: 1;
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 24px;
   background:
     radial-gradient(ellipse at center, rgba(40, 35, 30, 0.8) 0%, rgba(15, 12, 10, 0.95) 100%),
     repeating-linear-gradient(
@@ -15,8 +13,74 @@
   background-color: #1a1510;
   border-top: 1px solid #333;
   border-bottom: 1px solid #333;
+  transition: all 0.2s ease;
 }
 
+.board.expanded {
+  flex: 1;
+  padding: 8px 16px 16px;
+}
+
+.board.collapsed {
+  padding: 8px 16px;
+}
+
+/* Top bar with toggle */
+.topBar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 8px;
+}
+
+.toggleBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 4px;
+  border: 1px solid #444;
+  background: #2a2a2a;
+  color: #888;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.toggleBtn:hover {
+  background: #363636;
+  color: #aaa;
+}
+
+.toggleBtn.on {
+  background: #2a2a1a;
+  color: #e0c44d;
+  border-color: #5a5a2a;
+}
+
+.toggleDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  background: #444;
+  transition: all 0.15s ease;
+}
+
+.on .toggleDot {
+  background: #e0c44d;
+  box-shadow: 0 0 6px #e0c44d;
+}
+
+.chainCount {
+  font-size: 10px;
+  color: #555;
+  font-weight: 600;
+}
+
+/* Effects chain */
 .chain {
   display: flex;
   align-items: center;

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -17,6 +18,7 @@ import { useAudioEngineContext } from '../../context/AudioEngineContext';
 
 export function Pedalboard() {
   const { chain, reorderEffects } = useAudioEngineContext();
+  const [expanded, setExpanded] = useState(true);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -38,26 +40,41 @@ export function Pedalboard() {
   };
 
   return (
-    <div className={styles.board}>
-      <div className={styles.chain}>
-        {chain.length === 0 && (
-          <div className={styles.empty}>
-            Add effects to build your signal chain
-          </div>
-        )}
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
+    <div className={`${styles.board} ${expanded ? styles.expanded : styles.collapsed}`}>
+      <div className={styles.topBar}>
+        <button
+          className={`${styles.toggleBtn} ${expanded ? styles.on : ''}`}
+          onClick={() => setExpanded(!expanded)}
         >
-          <SortableContext items={chain.map((s) => s.id)} strategy={horizontalListSortingStrategy}>
-            {chain.map((slot) => (
-              <Pedal key={slot.id} slot={slot} />
-            ))}
-          </SortableContext>
-        </DndContext>
-        <AddPedal />
+          <span className={styles.toggleDot} />
+          FX CHAIN
+        </button>
+        {expanded && chain.length > 0 && (
+          <span className={styles.chainCount}>{chain.length} pedal{chain.length !== 1 ? 's' : ''}</span>
+        )}
       </div>
+
+      {expanded && (
+        <div className={styles.chain}>
+          {chain.length === 0 && (
+            <div className={styles.empty}>
+              Add effects to build your signal chain
+            </div>
+          )}
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext items={chain.map((s) => s.id)} strategy={horizontalListSortingStrategy}>
+              {chain.map((slot) => (
+                <Pedal key={slot.id} slot={slot} />
+              ))}
+            </SortableContext>
+          </DndContext>
+          <AddPedal />
+        </div>
+      )}
     </div>
   );
 }
