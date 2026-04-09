@@ -7,6 +7,8 @@ export function useRecorder(getRecordingStream: () => MediaStream | null) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLooping, setIsLooping] = useState(false);
   const [duration, setDuration] = useState(0);
+  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+  const [downloadFilename, setDownloadFilename] = useState('');
 
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -20,6 +22,7 @@ export function useRecorder(getRecordingStream: () => MediaStream | null) {
     if (urlRef.current) {
       URL.revokeObjectURL(urlRef.current);
       urlRef.current = null;
+      setDownloadUrl(null);
     }
     if (audioRef.current) {
       audioRef.current.pause();
@@ -53,9 +56,12 @@ export function useRecorder(getRecordingStream: () => MediaStream | null) {
     recorder.onstop = () => {
       const blob = new Blob(chunksRef.current, { type: mimeType });
       blobRef.current = blob;
-      urlRef.current = URL.createObjectURL(blob);
+      const url = URL.createObjectURL(blob);
+      urlRef.current = url;
+      setDownloadUrl(url);
+      setDownloadFilename(`wamp-recording-${Date.now()}.webm`);
 
-      const audio = new Audio(urlRef.current);
+      const audio = new Audio(url);
       audioRef.current = audio;
 
       audio.onended = () => {
@@ -108,16 +114,6 @@ export function useRecorder(getRecordingStream: () => MediaStream | null) {
     }
   }, [isLooping]);
 
-  const download = useCallback(() => {
-    if (!blobRef.current) return;
-    const a = document.createElement('a');
-    a.href = urlRef.current!;
-    a.download = `wamp-recording-${Date.now()}.webm`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  }, []);
-
   const discard = useCallback(() => {
     cleanup();
     blobRef.current = null;
@@ -132,12 +128,13 @@ export function useRecorder(getRecordingStream: () => MediaStream | null) {
     isPlaying,
     isLooping,
     duration,
+    downloadUrl,
+    downloadFilename,
     hasRecording: state === 'stopped',
     startRecording,
     stopRecording,
     togglePlayback,
     toggleLoop,
-    download,
     discard,
   };
 }

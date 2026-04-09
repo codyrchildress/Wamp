@@ -112,7 +112,11 @@
   height: 16px;
 }
 
-/* Download button */
+/* Download button (an <a> tag styled as a button) */
+.downloadBtn {
+  text-decoration: none;
+}
+
 .downloadIcon {
   width: 16px;
   height: 16px;
