@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Synth, KEY_TO_SEMITONE, semitoneToMidi } from '../audio/Synth';
-import type { SynthWaveform } from '../audio/Synth';
+import type { SynthWaveform, ArpMode } from '../audio/Synth';
 
 export function useSynth(
   getContext: () => AudioContext | null,
@@ -15,6 +15,10 @@ export function useSynth(
   const [volume, setVolumeState] = useState(0.3);
   const [activeNotes, setActiveNotes] = useState<number[]>([]);
   const [enabled, setEnabled] = useState(false);
+  const [arpEnabled, setArpEnabledState] = useState(false);
+  const [arpMode, setArpModeState] = useState<ArpMode>('up');
+  const [arpBpm, setArpBpmState] = useState(240);
+  const [arpOctaves, setArpOctavesState] = useState(1);
   const heldKeysRef = useRef<Set<string>>(new Set());
 
   // Create/destroy synth when engine starts/stops
@@ -29,6 +33,10 @@ export function useSynth(
         synth.attack = attack;
         synth.release = release;
         synth.volume = volume;
+        synth.arpEnabled = arpEnabled;
+        synth.arpMode = arpMode;
+        synth.arpBpm = arpBpm;
+        synth.arpOctaves = arpOctaves;
         synthRef.current = synth;
       }
     }
@@ -42,6 +50,15 @@ export function useSynth(
     // Only recreate when enabled/isRunning changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isRunning, enabled]);
+
+  // Poll active notes during arp playback so the UI highlights keys
+  useEffect(() => {
+    if (!isRunning || !enabled || !arpEnabled) return;
+    const id = setInterval(() => {
+      setActiveNotes(synthRef.current?.getActiveNotes() ?? []);
+    }, 50);
+    return () => clearInterval(id);
+  }, [isRunning, enabled, arpEnabled]);
 
   // Keyboard event handlers
   useEffect(() => {
@@ -155,6 +172,26 @@ export function useSynth(
     if (synthRef.current) synthRef.current.volume = v;
   }, []);
 
+  const setArpEnabled = useCallback((v: boolean) => {
+    setArpEnabledState(v);
+    if (synthRef.current) synthRef.current.arpEnabled = v;
+  }, []);
+
+  const setArpMode = useCallback((m: ArpMode) => {
+    setArpModeState(m);
+    if (synthRef.current) synthRef.current.arpMode = m;
+  }, []);
+
+  const setArpBpm = useCallback((v: number) => {
+    setArpBpmState(v);
+    if (synthRef.current) synthRef.current.arpBpm = v;
+  }, []);
+
+  const setArpOctaves = useCallback((v: number) => {
+    setArpOctavesState(v);
+    if (synthRef.current) synthRef.current.arpOctaves = v;
+  }, []);
+
   // Mouse note triggers (for clicking the visual keyboard)
   const mouseNoteOn = useCallback((midi: number) => {
     synthRef.current?.noteOn(midi);
@@ -182,6 +219,14 @@ export function useSynth(
     activeNotes,
     mouseNoteOn,
     mouseNoteOff,
+    arpEnabled,
+    setArpEnabled,
+    arpMode,
+    setArpMode,
+    arpBpm,
+    setArpBpm,
+    arpOctaves,
+    setArpOctaves,
   };
 }
 

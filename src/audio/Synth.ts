@@ -1,4 +1,5 @@
 export type SynthWaveform = 'sine' | 'square' | 'sawtooth' | 'triangle';
+export type ArpMode = 'up' | 'down' | 'updown' | 'random';
 
 interface Voice {
   osc: OscillatorNode;
@@ -21,6 +22,17 @@ export class Synth {
   private _release = 0.15;
   private _volume = 0.3;
 
+  // Arpeggiator state
+  private _arpEnabled = false;
+  private _arpMode: ArpMode = 'up';
+  private _arpBpm = 240;
+  private _arpOctaves = 1;
+  private arpHeldNotes: Set<number> = new Set();
+  private arpTimer: ReturnType<typeof setInterval> | null = null;
+  private arpIndex = 0;
+  private arpDirection = 1; // 1 = up, -1 = down (for updown mode)
+  private arpCurrentNote: number | null = null;
+
   constructor(ctx: AudioContext, destination: AudioNode) {
     this.ctx = ctx;
     this.output = ctx.createGain();
@@ -29,6 +41,27 @@ export class Synth {
   }
 
   noteOn(midiNote: number): void {
+    if (this._arpEnabled) {
+      this.arpHeldNotes.add(midiNote);
+      if (!this.arpTimer) this.startArp();
+      return;
+    }
+
+    if (this.voices.has(midiNote)) return;
+    this.playVoice(midiNote);
+  }
+
+  noteOff(midiNote: number): void {
+    if (this._arpEnabled) {
+      this.arpHeldNotes.delete(midiNote);
+      if (this.arpHeldNotes.size === 0) this.stopArp();
+      return;
+    }
+
+    this.releaseVoice(midiNote);
+  }
+
+  private playVoice(midiNote: number): void {
     if (this.voices.has(midiNote)) return;
 
     const freq = 440 * Math.pow(2, (midiNote - 69) / 12);
@@ -44,7 +77,6 @@ export class Synth {
     gain.connect(this.output);
     osc.start();
 
-    // Attack envelope
     const now = this.ctx.currentTime;
     gain.gain.setValueAtTime(0, now);
     gain.gain.linearRampToValueAtTime(1, now + this._attack);
@@ -52,7 +84,7 @@ export class Synth {
     this.voices.set(midiNote, { osc, gain, note: midiNote });
   }
 
-  noteOff(midiNote: number): void {
+  private releaseVoice(midiNote: number): void {
     const voice = this.voices.get(midiNote);
     if (!voice) return;
 
@@ -61,7 +93,6 @@ export class Synth {
     voice.gain.gain.setValueAtTime(voice.gain.gain.value, now);
     voice.gain.gain.linearRampToValueAtTime(0, now + this._release);
 
-    // Clean up after release
     const releaseMs = this._release * 1000 + 50;
     setTimeout(() => {
       voice.osc.stop();
@@ -74,9 +105,92 @@ export class Synth {
 
   allNotesOff(): void {
     for (const midiNote of [...this.voices.keys()]) {
-      this.noteOff(midiNote);
+      this.releaseVoice(midiNote);
+    }
+    this.arpHeldNotes.clear();
+    this.stopArp();
+  }
+
+  // --- Arpeggiator ---
+
+  private getArpSequence(): number[] {
+    const baseNotes = [...this.arpHeldNotes].sort((a, b) => a - b);
+    if (baseNotes.length === 0) return [];
+
+    const notes: number[] = [];
+    for (let oct = 0; oct < this._arpOctaves; oct++) {
+      for (const n of baseNotes) {
+        notes.push(n + oct * 12);
+      }
+    }
+
+    switch (this._arpMode) {
+      case 'up':
+        return notes;
+      case 'down':
+        return notes.reverse();
+      case 'updown': {
+        if (notes.length <= 1) return notes;
+        const down = notes.slice(1, -1).reverse();
+        return [...notes, ...down];
+      }
+      case 'random':
+        return notes; // randomized at step time
     }
   }
+
+  private startArp(): void {
+    this.stopArp();
+    this.arpIndex = 0;
+    this.arpDirection = 1;
+    const intervalMs = (60 / this._arpBpm) * 1000;
+    this.arpStep();
+    this.arpTimer = setInterval(() => this.arpStep(), intervalMs);
+  }
+
+  private stopArp(): void {
+    if (this.arpTimer) {
+      clearInterval(this.arpTimer);
+      this.arpTimer = null;
+    }
+    if (this.arpCurrentNote !== null) {
+      this.releaseVoice(this.arpCurrentNote);
+      this.arpCurrentNote = null;
+    }
+    this.arpIndex = 0;
+  }
+
+  private arpStep(): void {
+    // Release previous note
+    if (this.arpCurrentNote !== null) {
+      this.releaseVoice(this.arpCurrentNote);
+      this.arpCurrentNote = null;
+    }
+
+    const seq = this.getArpSequence();
+    if (seq.length === 0) return;
+
+    let note: number;
+    if (this._arpMode === 'random') {
+      note = seq[Math.floor(Math.random() * seq.length)];
+    } else {
+      this.arpIndex = this.arpIndex % seq.length;
+      note = seq[this.arpIndex];
+      this.arpIndex++;
+    }
+
+    this.playVoice(note);
+    this.arpCurrentNote = note;
+  }
+
+  private restartArpTimer(): void {
+    if (!this.arpTimer) return;
+    clearInterval(this.arpTimer);
+    const intervalMs = (60 / this._arpBpm) * 1000;
+    this.arpTimer = setInterval(() => this.arpStep(), intervalMs);
+  }
+
+  // --- Getters/Setters ---
 
   get waveform(): SynthWaveform { return this._waveform; }
   set waveform(w: SynthWaveform) {
@@ -102,6 +216,33 @@ export class Synth {
   set volume(v: number) {
     this._volume = v;
     this.output.gain.linearRampToValueAtTime(v, this.ctx.currentTime + 0.01);
+  }
+
+  get arpEnabled(): boolean { return this._arpEnabled; }
+  set arpEnabled(v: boolean) {
+    this._arpEnabled = v;
+    if (!v) {
+      this.stopArp();
+      this.arpHeldNotes.clear();
+    }
+  }
+
+  get arpMode(): ArpMode { return this._arpMode; }
+  set arpMode(m: ArpMode) {
+    this._arpMode = m;
+    this.arpIndex = 0;
+  }
+
+  get arpBpm(): number { return this._arpBpm; }
+  set arpBpm(v: number) {
+    this._arpBpm = v;
+    this.restartArpTimer();
+  }
+
+  get arpOctaves(): number { return this._arpOctaves; }
+  set arpOctaves(v: number) {
+    this._arpOctaves = Math.max(1, Math.min(4, v));
+    this.arpIndex = 0;
   }
 
   getActiveNotes(): number[] {

@@ -172,6 +172,28 @@
   border: none;
 }
 
+/* Arpeggiator */
+.arpDivider {
+  width: 1px;
+  height: 20px;
+  background: #333;
+}
+
+.arpActive {
+  background: #2a1a3a !important;
+  color: #cc66ff !important;
+  border-color: #5a2a7a !important;
+}
+
+.arpValue {
+  font-size: 10px;
+  font-weight: 700;
+  color: #cc66ff;
+  min-width: 28px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
 .hint {
   font-size: 10px;
   color: #444;

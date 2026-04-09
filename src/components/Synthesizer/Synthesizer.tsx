@@ -1,8 +1,15 @@
 import { useCallback } from 'react';
 import styles from './Synthesizer.module.css';
 import { semitoneToMidi } from '../../audio/Synth';
-import type { SynthWaveform } from '../../audio/Synth';
+import type { SynthWaveform, ArpMode } from '../../audio/Synth';
 import type { SynthAPI } from '../../hooks/useSynth';
+
+const ARP_MODES: { value: ArpMode; label: string }[] = [
+  { value: 'up', label: 'Up' },
+  { value: 'down', label: 'Down' },
+  { value: 'updown', label: 'U/D' },
+  { value: 'random', label: 'Rnd' },
+];
 
 const WAVEFORMS: { value: SynthWaveform; label: string }[] = [
   { value: 'sine', label: 'Sine' },
@@ -74,6 +81,14 @@ export function Synthesizer({ synth }: SynthesizerProps) {
     activeNotes,
     mouseNoteOn,
     mouseNoteOff,
+    arpEnabled,
+    setArpEnabled,
+    arpMode,
+    setArpMode,
+    arpBpm,
+    setArpBpm,
+    arpOctaves,
+    setArpOctaves,
   } = synth;
 
   const isNoteActive = useCallback(
@@ -180,6 +195,56 @@ export function Synthesizer({ synth }: SynthesizerProps) {
                 onChange={(e) => setVolume(Number(e.target.value))}
               />
             </div>
+
+            {/* Arpeggiator */}
+            <div className={styles.arpDivider} />
+
+            <button
+              className={`${styles.waveBtn} ${arpEnabled ? styles.arpActive : ''}`}
+              onClick={() => setArpEnabled(!arpEnabled)}
+            >
+              ARP
+            </button>
+
+            {arpEnabled && (
+              <>
+                <div className={styles.controlGroup}>
+                  <span className={styles.controlLabel}>Mode</span>
+                  <div className={styles.waveformBtns}>
+                    {ARP_MODES.map((m) => (
+                      <button
+                        key={m.value}
+                        className={`${styles.waveBtn} ${arpMode === m.value ? styles.activeWave : ''}`}
+                        onClick={() => setArpMode(m.value)}
+                      >
+                        {m.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className={styles.controlGroup}>
+                  <span className={styles.controlLabel}>BPM</span>
+                  <input
+                    type="range"
+                    className={styles.slider}
+                    min={60}
+                    max={600}
+                    step={10}
+                    value={arpBpm}
+                    onChange={(e) => setArpBpm(Number(e.target.value))}
+                  />
+                  <span className={styles.arpValue}>{arpBpm}</span>
+                </div>
+
+                <div className={styles.controlGroup}>
+                  <span className={styles.controlLabel}>Oct</span>
+                  <button className={styles.octaveBtn} onClick={() => setArpOctaves(arpOctaves - 1)} disabled={arpOctaves <= 1}>-</button>
+                  <span className={styles.octaveValue}>{arpOctaves}</span>
+                  <button className={styles.octaveBtn} onClick={() => setArpOctaves(arpOctaves + 1)} disabled={arpOctaves >= 4}>+</button>
+                </div>
+              </>
+            )}
 
             <span className={styles.hint}>Arrows: octave</span>
           </>
