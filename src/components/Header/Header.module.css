@@ -92,3 +92,9 @@
   align-items: center;
   gap: 16px;
 }
+
+.divider {
+  width: 1px;
+  height: 28px;
+  background: #333;
+}

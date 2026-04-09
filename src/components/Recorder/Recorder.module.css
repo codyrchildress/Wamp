@@ -1,0 +1,131 @@
+.recorder {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  border: 1px solid #444;
+  background: #2a2a2a;
+  color: #aaa;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+
+.btn:hover {
+  background: #363636;
+  color: #ddd;
+}
+
+.btn.active {
+  border-color: #4da6e0;
+  color: #4da6e0;
+  background: #1a2a3a;
+}
+
+/* Record button */
+.recordBtn {
+  border-color: #663333;
+}
+
+.recordBtn:hover {
+  border-color: #884444;
+  background: #331a1a;
+}
+
+.recordDot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #cc3333;
+  display: block;
+}
+
+/* Stop button */
+.stopBtn {
+  border-color: #cc3333;
+  background: #331a1a;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.stopSquare {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  background: #cc3333;
+  display: block;
+}
+
+@keyframes pulse {
+  0%, 100% { border-color: #cc3333; }
+  50% { border-color: #ff5555; }
+}
+
+/* Timer */
+.timer {
+  font-size: 12px;
+  font-weight: 600;
+  color: #cc3333;
+  min-width: 36px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Play button */
+.playBtn:hover {
+  border-color: #55cc55;
+  color: #55cc55;
+}
+
+.playIcon {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 6px 0 6px 10px;
+  border-color: transparent transparent transparent currentColor;
+  display: block;
+  margin-left: 2px;
+}
+
+.pauseIcon {
+  display: flex;
+  gap: 3px;
+}
+
+.pauseIcon span {
+  width: 3px;
+  height: 12px;
+  background: currentColor;
+  border-radius: 1px;
+}
+
+/* Loop button */
+.loopIcon {
+  width: 16px;
+  height: 16px;
+}
+
+/* Download button */
+.downloadIcon {
+  width: 16px;
+  height: 16px;
+}
+
+/* Discard button */
+.discardBtn {
+  font-size: 16px;
+  line-height: 1;
+  color: #666;
+}
+
+.discardBtn:hover {
+  color: #cc3333;
+  border-color: #663333;
+}
