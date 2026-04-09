@@ -34,6 +34,7 @@ export function Recorder() {
           title="Record"
         >
           <span className={styles.recordDot} />
+          <span className={styles.btnLabel}>REC</span>
         </button>
       ) : (
         <button
@@ -42,12 +43,8 @@ export function Recorder() {
           title="Stop recording"
         >
           <span className={styles.stopSquare} />
+          <span className={styles.btnLabel}>{formatTime(duration)}</span>
         </button>
-      )}
-
-      {/* Timer */}
-      {state === 'recording' && (
-        <span className={styles.timer}>{formatTime(duration)}</span>
       )}
 
       {/* Playback controls (only after recording) */}
@@ -82,16 +79,12 @@ export function Recorder() {
 
           {downloadUrl && (
             <a
-              className={`${styles.btn} ${styles.downloadBtn}`}
+              className={`${styles.btn} ${styles.saveBtn}`}
               href={downloadUrl}
               download={downloadFilename}
               title="Download recording"
             >
-              <svg className={styles.downloadIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="15" x2="12" y2="3" />
-              </svg>
+              SAVE
             </a>
           )}
 
