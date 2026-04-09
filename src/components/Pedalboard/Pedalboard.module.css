@@ -29,8 +29,8 @@
 .topBar {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 0 8px;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 .toggleBtn {
@@ -76,7 +76,7 @@
 
 .chainCount {
   font-size: 10px;
-  color: #555;
+  color: #444;
   font-weight: 600;
 }
 
