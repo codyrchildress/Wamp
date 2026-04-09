@@ -87,7 +87,7 @@ export class Growl extends BaseEffect {
     this.updateMix();
   }
 
-  private makeSubOctaveCurve(): Float32Array {
+  private makeSubOctaveCurve(): Float32Array<ArrayBuffer> {
     // Creates a square-wave-like transfer function that produces sub-harmonics
     const samples = 8192;
     const curve = new Float32Array(samples);

@@ -46,14 +46,14 @@ export class RingModulator extends BaseEffect {
   }
 
   private updateDepth(): void {
-    // Scale oscillator amplitude based on depth
-    // At 100% depth, oscillator swings gain from -1 to 1 (full ring mod)
-    // At lower depths, the swing is reduced
-    const amplitude = this.depth / 100;
+    // Scale oscillator output to control ring mod intensity.
+    // At 100% depth, oscillator swings gain fully; at lower depths, swing is reduced.
+    // We reconnect through a scaling gain node by adjusting the oscillator's output level.
     this.oscillator.disconnect();
-    this.oscillator.connect(this.modGain.gain);
-    // The oscillator output is [-1, 1], so modGain.gain oscillates in that range
-    // We need to scale it
+    const scaledGain = this.ctx.createGain();
+    scaledGain.gain.value = this.depth / 100;
+    this.oscillator.connect(scaledGain);
+    scaledGain.connect(this.modGain.gain);
     this.modGain.gain.value = 0;
   }
 
