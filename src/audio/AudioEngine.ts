@@ -192,6 +192,10 @@ export class AudioEngine {
     this.sourceNode.connect(this.inputGain);
   }
 
+  getInputNode(): GainNode | null {
+    return this.inputGain;
+  }
+
   getRecordingStream(): MediaStream | null {
     return this.recordingDest?.stream ?? null;
   }

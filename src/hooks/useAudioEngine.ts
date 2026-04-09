@@ -112,6 +112,14 @@ export function useAudioEngine() {
     return engineRef.current.getRecordingStream();
   }, []);
 
+  const getContext = useCallback(() => {
+    return engineRef.current.getContext();
+  }, []);
+
+  const getInputNode = useCallback(() => {
+    return engineRef.current.getInputNode();
+  }, []);
+
   return {
     isRunning,
     chain,
@@ -130,6 +138,8 @@ export function useAudioEngine() {
     switchInput,
     getChainState: () => engineRef.current.getChainState(),
     getRecordingStream,
+    getContext,
+    getInputNode,
   };
 }
 

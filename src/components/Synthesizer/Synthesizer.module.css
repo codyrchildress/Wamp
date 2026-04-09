@@ -1,0 +1,252 @@
+.synth {
+  background: linear-gradient(180deg, #1a1a1a, #141414);
+  border-top: 1px solid #222;
+  padding: 8px 16px;
+  transition: all 0.2s ease;
+}
+
+.synth.enabled {
+  border-top: 1px solid #333;
+}
+
+/* Top bar with controls */
+.topBar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.toggleBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 4px;
+  border: 1px solid #444;
+  background: #2a2a2a;
+  color: #888;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.toggleBtn:hover {
+  background: #363636;
+  color: #aaa;
+}
+
+.toggleBtn.on {
+  background: #1a2a3a;
+  color: #4da6e0;
+  border-color: #2a4a6a;
+}
+
+.toggleDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  background: #444;
+  transition: all 0.15s ease;
+}
+
+.on .toggleDot {
+  background: #4da6e0;
+  box-shadow: 0 0 6px #4da6e0;
+}
+
+/* Control groups */
+.controlGroup {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.controlLabel {
+  font-size: 10px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 24px;
+}
+
+/* Waveform buttons */
+.waveformBtns {
+  display: flex;
+  gap: 2px;
+}
+
+.waveBtn {
+  padding: 3px 8px;
+  border: 1px solid #333;
+  border-radius: 3px;
+  background: #222;
+  color: #777;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.waveBtn:hover {
+  background: #2a2a2a;
+  color: #aaa;
+}
+
+.waveBtn.activeWave {
+  background: #1a2a3a;
+  color: #4da6e0;
+  border-color: #2a4a6a;
+}
+
+/* Octave controls */
+.octaveBtn {
+  width: 22px;
+  height: 22px;
+  border: 1px solid #333;
+  border-radius: 3px;
+  background: #222;
+  color: #999;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+}
+
+.octaveBtn:hover:not(:disabled) {
+  background: #2a2a2a;
+  color: #ddd;
+}
+
+.octaveBtn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.octaveValue {
+  font-size: 13px;
+  font-weight: 700;
+  color: #4da6e0;
+  min-width: 16px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Sliders */
+.slider {
+  width: 60px;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: #333;
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #4da6e0;
+  cursor: pointer;
+  border: none;
+}
+
+.slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #4da6e0;
+  cursor: pointer;
+  border: none;
+}
+
+.hint {
+  font-size: 10px;
+  color: #444;
+  margin-left: auto;
+}
+
+/* Piano keyboard */
+.keyboard {
+  display: flex;
+  margin-top: 8px;
+  height: 72px;
+  gap: 1px;
+  user-select: none;
+}
+
+.key {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 4px;
+  border-radius: 0 0 4px 4px;
+  cursor: pointer;
+  transition: background 0.05s ease;
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.white {
+  background: linear-gradient(180deg, #ddd, #bbb);
+  border: 1px solid #999;
+  color: #666;
+}
+
+.white:hover {
+  background: linear-gradient(180deg, #eee, #ccc);
+}
+
+.white.pressed {
+  background: linear-gradient(180deg, #4da6e0, #3888c0);
+  border-color: #2a6a9a;
+  color: #fff;
+}
+
+.black {
+  background: linear-gradient(180deg, #333, #111);
+  border: 1px solid #000;
+  color: #555;
+  height: 48px;
+  margin: 0 -3px;
+  z-index: 1;
+  flex: 0 0 24px;
+}
+
+.black:hover {
+  background: linear-gradient(180deg, #444, #222);
+}
+
+.black.pressed {
+  background: linear-gradient(180deg, #3888c0, #2a6a9a);
+  border-color: #1a4a6a;
+  color: #cce5ff;
+}
+
+.keyHint {
+  font-size: 8px;
+  font-weight: 700;
+  opacity: 0.6;
+  line-height: 1;
+}
+
+.keyNote {
+  font-size: 8px;
+  font-weight: 600;
+  line-height: 1;
+  margin-top: 2px;
+}
