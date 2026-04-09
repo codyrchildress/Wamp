@@ -3,6 +3,7 @@ import { Knob } from '../Knob/Knob';
 import { LevelMeter } from '../LevelMeter/LevelMeter';
 import { InputSelector } from '../InputSelector/InputSelector';
 import { PresetManager } from '../PresetManager/PresetManager';
+import { Recorder } from '../Recorder/Recorder';
 import { useAudioEngineContext } from '../../context/AudioEngineContext';
 import { usePresets } from '../../hooks/usePresets';
 import type { ParamDescriptor } from '../../types/effects';
@@ -75,6 +76,8 @@ export function Header() {
       <div className={styles.right}>
         {isRunning && (
           <>
+            <Recorder />
+            <div className={styles.divider} />
             <LevelMeter level={inputLevel} label="IN" />
             <LevelMeter level={outputLevel} label="OUT" color="#4da6e0" />
             <Knob

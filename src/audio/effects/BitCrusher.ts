@@ -95,10 +95,8 @@ export class BitCrusher extends BaseEffect {
         break;
       case 'crush':
         this.crush = value;
-        // Drive the input harder for more aggressive crushing
-        const drive = 1 + (value / 100) * 2;
         this.preGain.gain.linearRampToValueAtTime(
-          drive,
+          1 + (value / 100) * 2,
           this.ctx.currentTime + 0.01
         );
         break;

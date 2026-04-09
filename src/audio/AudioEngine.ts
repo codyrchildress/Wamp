@@ -9,6 +9,7 @@ export class AudioEngine {
   private outputGain: GainNode | null = null;
   private inputAnalyser: AnalyserNode | null = null;
   private outputAnalyser: AnalyserNode | null = null;
+  private recordingDest: MediaStreamAudioDestinationNode | null = null;
   private effects: EffectNode[] = [];
   private masterVolume = 1;
 
@@ -87,6 +88,12 @@ export class AudioEngine {
     prevOutput.connect(this.outputGain);
     this.outputGain.connect(this.outputAnalyser);
     this.outputAnalyser.connect(this.ctx.destination);
+
+    // Recording tap: connect output to a MediaStreamDestination for recording
+    if (!this.recordingDest && this.ctx) {
+      this.recordingDest = this.ctx.createMediaStreamDestination();
+    }
+    this.outputAnalyser.connect(this.recordingDest!);
   }
 
   addEffect(type: EffectType, params?: Record<string, number>): EffectNode {
@@ -183,6 +190,14 @@ export class AudioEngine {
 
     this.sourceNode = this.ctx.createMediaStreamSource(this.stream);
     this.sourceNode.connect(this.inputGain);
+  }
+
+  getInputNode(): GainNode | null {
+    return this.inputGain;
+  }
+
+  getRecordingStream(): MediaStream | null {
+    return this.recordingDest?.stream ?? null;
   }
 
   clearChain(): void {

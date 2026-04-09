@@ -108,6 +108,18 @@ export function useAudioEngine() {
     return () => cancelAnimationFrame(raf);
   }, [isRunning]);
 
+  const getRecordingStream = useCallback(() => {
+    return engineRef.current.getRecordingStream();
+  }, []);
+
+  const getContext = useCallback(() => {
+    return engineRef.current.getContext();
+  }, []);
+
+  const getInputNode = useCallback(() => {
+    return engineRef.current.getInputNode();
+  }, []);
+
   return {
     isRunning,
     chain,
@@ -125,6 +137,9 @@ export function useAudioEngine() {
     loadPresetChain,
     switchInput,
     getChainState: () => engineRef.current.getChainState(),
+    getRecordingStream,
+    getContext,
+    getInputNode,
   };
 }
 

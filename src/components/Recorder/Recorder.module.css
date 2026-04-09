@@ -1,0 +1,168 @@
+.recorder {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 30px;
+  border-radius: 4px;
+  border: 1px solid #444;
+  background: #2a2a2a;
+  color: #aaa;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0 6px;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.btn:hover {
+  background: #363636;
+  color: #ddd;
+}
+
+.btn.active {
+  border-color: #4da6e0;
+  color: #4da6e0;
+  background: #1a2a3a;
+}
+
+.btnLabel {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* Record button */
+.recordBtn {
+  border-color: #663333;
+}
+
+.recordBtn:hover {
+  border-color: #884444;
+  background: #331a1a;
+}
+
+.recordBtn .btnLabel {
+  color: #cc3333;
+}
+
+.recordDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #cc3333;
+  display: block;
+  flex-shrink: 0;
+}
+
+/* Stop button */
+.stopBtn {
+  border-color: #cc3333;
+  background: #331a1a;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.stopBtn .btnLabel {
+  color: #cc3333;
+  font-variant-numeric: tabular-nums;
+}
+
+.stopSquare {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: #cc3333;
+  display: block;
+  flex-shrink: 0;
+}
+
+@keyframes pulse {
+  0%, 100% { border-color: #cc3333; }
+  50% { border-color: #ff5555; }
+}
+
+/* Play button */
+.playBtn {
+  width: 30px;
+  padding: 0;
+}
+
+.playBtn:hover {
+  border-color: #55cc55;
+  color: #55cc55;
+}
+
+.playBtn.active {
+  border-color: #55cc55;
+  color: #55cc55;
+  background: #1a2a1a;
+}
+
+.playIcon {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 5px 0 5px 9px;
+  border-color: transparent transparent transparent currentColor;
+  display: block;
+  margin-left: 2px;
+}
+
+.pauseIcon {
+  display: flex;
+  gap: 3px;
+}
+
+.pauseIcon span {
+  width: 3px;
+  height: 10px;
+  background: currentColor;
+  border-radius: 1px;
+}
+
+/* Loop button */
+.loopBtn {
+  width: 30px;
+  padding: 0;
+}
+
+.loopIcon {
+  width: 14px;
+  height: 14px;
+}
+
+/* Save / download button */
+.saveBtn {
+  border-color: #2a5a2a;
+  color: #55cc55;
+  background: #1a2a1a;
+}
+
+.saveBtn:hover {
+  background: #1a3a1a;
+  color: #77ee77;
+  border-color: #3a7a3a;
+}
+
+/* Discard button */
+.discardBtn {
+  width: 30px;
+  padding: 0;
+  font-size: 16px;
+  line-height: 1;
+  color: #666;
+}
+
+.discardBtn:hover {
+  color: #cc3333;
+  border-color: #663333;
+}
