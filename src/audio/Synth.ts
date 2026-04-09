@@ -30,7 +30,6 @@ export class Synth {
   private arpHeldNotes: Set<number> = new Set();
   private arpTimer: ReturnType<typeof setInterval> | null = null;
   private arpIndex = 0;
-  private arpDirection = 1; // 1 = up, -1 = down (for updown mode)
   private arpCurrentNote: number | null = null;
 
   constructor(ctx: AudioContext, destination: AudioNode) {
@@ -142,7 +141,6 @@ export class Synth {
   private startArp(): void {
     this.stopArp();
     this.arpIndex = 0;
-    this.arpDirection = 1;
     const intervalMs = (60 / this._arpBpm) * 1000;
     this.arpStep();
     this.arpTimer = setInterval(() => this.arpStep(), intervalMs);
