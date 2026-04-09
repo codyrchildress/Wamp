@@ -12,6 +12,7 @@ export class AudioEngine {
   private recordingDest: MediaStreamAudioDestinationNode | null = null;
   private effects: EffectNode[] = [];
   private masterVolume = 1;
+  private micMuted = false;
 
   async start(deviceId?: string): Promise<void> {
     const constraints: MediaStreamConstraints = {
@@ -190,6 +191,21 @@ export class AudioEngine {
 
     this.sourceNode = this.ctx.createMediaStreamSource(this.stream);
     this.sourceNode.connect(this.inputGain);
+  }
+
+  setMicMuted(muted: boolean): void {
+    this.micMuted = muted;
+    if (this.sourceNode) {
+      if (muted) {
+        this.sourceNode.disconnect();
+      } else if (this.inputGain) {
+        this.sourceNode.connect(this.inputGain);
+      }
+    }
+  }
+
+  isMicMuted(): boolean {
+    return this.micMuted;
   }
 
   getInputNode(): GainNode | null {

@@ -11,6 +11,7 @@ export function useAudioEngine() {
   const [masterVolume, setMasterVolumeState] = useState(1);
   const [inputLevel, setInputLevel] = useState(0);
   const [outputLevel, setOutputLevel] = useState(0);
+  const [micMuted, setMicMutedState] = useState(false);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const syncChain = useCallback(() => {
@@ -108,6 +109,12 @@ export function useAudioEngine() {
     return () => cancelAnimationFrame(raf);
   }, [isRunning]);
 
+  const toggleMicMute = useCallback(() => {
+    const next = !engineRef.current.isMicMuted();
+    engineRef.current.setMicMuted(next);
+    setMicMutedState(next);
+  }, []);
+
   const getRecordingStream = useCallback(() => {
     return engineRef.current.getRecordingStream();
   }, []);
@@ -126,6 +133,8 @@ export function useAudioEngine() {
     masterVolume,
     inputLevel,
     outputLevel,
+    micMuted,
+    toggleMicMute,
     start,
     stop,
     addEffect,

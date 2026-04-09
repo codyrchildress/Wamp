@@ -48,8 +48,9 @@ export function useSynth(
     if (!isRunning || !enabled) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't intercept when typing in inputs
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      // Don't intercept when typing in text inputs (but allow range sliders)
+      if (e.target instanceof HTMLTextAreaElement) return;
+      if (e.target instanceof HTMLInputElement && e.target.type !== 'range') return;
       if (e.repeat) return;
 
       const key = e.key.toLowerCase();
