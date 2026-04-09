@@ -7,7 +7,10 @@ export type EffectType =
   | 'eq'
   | 'compressor'
   | 'volume'
-  | 'pitchshifter';
+  | 'pitchshifter'
+  | 'growl'
+  | 'ringmod'
+  | 'bitcrusher';
 
 export interface ParamDescriptor {
   name: string;

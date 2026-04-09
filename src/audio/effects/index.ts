@@ -8,6 +8,9 @@ import { EQ } from './EQ';
 import { Compressor } from './Compressor';
 import { Volume } from './Volume';
 import { PitchShifter } from './PitchShifter';
+import { Growl } from './Growl';
+import { RingModulator } from './RingModulator';
+import { BitCrusher } from './BitCrusher';
 
 export function createEffect(ctx: AudioContext, type: EffectType): EffectNode {
   switch (type) {
@@ -20,6 +23,9 @@ export function createEffect(ctx: AudioContext, type: EffectType): EffectNode {
     case 'compressor': return new Compressor(ctx);
     case 'volume': return new Volume(ctx);
     case 'pitchshifter': return new PitchShifter(ctx);
+    case 'growl': return new Growl(ctx);
+    case 'ringmod': return new RingModulator(ctx);
+    case 'bitcrusher': return new BitCrusher(ctx);
   }
 }
 
@@ -73,6 +79,22 @@ const PARAM_DESCRIPTORS: Record<EffectType, ParamDescriptor[]> = {
     { name: 'formant', label: 'Formant', min: -12, max: 12, default: 0, step: 1, unit: 'st' },
     { name: 'mix', label: 'Mix', min: 0, max: 100, default: 100, step: 1, unit: '%' },
   ],
+  growl: [
+    { name: 'growl', label: 'Growl', min: 0, max: 100, default: 70, step: 1, unit: '%' },
+    { name: 'sub', label: 'Sub', min: 0, max: 100, default: 50, step: 1, unit: '%' },
+    { name: 'tone', label: 'Tone', min: 0, max: 100, default: 50, step: 1, unit: '%' },
+    { name: 'mix', label: 'Mix', min: 0, max: 100, default: 80, step: 1, unit: '%' },
+  ],
+  ringmod: [
+    { name: 'freq', label: 'Freq', min: 1, max: 500, default: 30, step: 1, unit: 'Hz' },
+    { name: 'depth', label: 'Depth', min: 0, max: 100, default: 80, step: 1, unit: '%' },
+    { name: 'wave', label: 'Wave', min: 0, max: 1, default: 0, step: 1, unit: '' },
+  ],
+  bitcrusher: [
+    { name: 'bits', label: 'Bits', min: 1, max: 16, default: 8, step: 1, unit: 'bit' },
+    { name: 'rate', label: 'Rate', min: 0, max: 100, default: 50, step: 1, unit: '%' },
+    { name: 'crush', label: 'Crush', min: 0, max: 100, default: 60, step: 1, unit: '%' },
+  ],
 };
 
 export function getParamDescriptors(type: EffectType): ParamDescriptor[] {
@@ -89,8 +111,12 @@ export const EFFECT_LABELS: Record<EffectType, string> = {
   compressor: 'Compressor',
   volume: 'Volume',
   pitchshifter: 'Pitch Shifter',
+  growl: 'Growl',
+  ringmod: 'Ring Mod',
+  bitcrusher: 'BitCrusher',
 };
 
 export const ALL_EFFECT_TYPES: EffectType[] = [
   'distortion', 'delay', 'reverb', 'chorus', 'tremolo', 'eq', 'compressor', 'volume', 'pitchshifter',
+  'growl', 'ringmod', 'bitcrusher',
 ];

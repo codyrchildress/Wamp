@@ -72,4 +72,25 @@ export const PEDAL_COLORS: Record<EffectType, PedalColor> = {
     led: '#ff66cc',
     text: '#ffccee',
   },
+  growl: {
+    bg: 'linear-gradient(145deg, #4a1a0a, #2d0d05)',
+    accent: '#cc3300',
+    knob: '#cc3300',
+    led: '#ff4400',
+    text: '#ffccbb',
+  },
+  ringmod: {
+    bg: 'linear-gradient(145deg, #1a1a4a, #0d0d2d)',
+    accent: '#6666ff',
+    knob: '#6666ff',
+    led: '#9999ff',
+    text: '#ccccff',
+  },
+  bitcrusher: {
+    bg: 'linear-gradient(145deg, #2a2a2a, #0a0a0a)',
+    accent: '#00ff66',
+    knob: '#00ff66',
+    led: '#00ff44',
+    text: '#ccffdd',
+  },
 };
