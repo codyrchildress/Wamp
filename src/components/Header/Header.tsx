@@ -27,6 +27,8 @@ export function Header() {
     setMasterVolume,
     inputLevel,
     outputLevel,
+    micMuted,
+    toggleMicMute,
     switchInput,
     loadPresetChain,
     chain,
@@ -59,6 +61,15 @@ export function Header() {
           )}
         </div>
         {isRunning && <InputSelector onSelect={switchInput} />}
+        {isRunning && (
+          <button
+            className={`${styles.muteBtn} ${micMuted ? styles.muted : ''}`}
+            onClick={toggleMicMute}
+            title={micMuted ? 'Unmute mic' : 'Mute mic'}
+          >
+            {micMuted ? 'MIC OFF' : 'MIC'}
+          </button>
+        )}
       </div>
 
       <div className={styles.center}>
