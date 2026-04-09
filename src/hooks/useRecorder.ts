@@ -1,38 +1,107 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export type RecorderState = 'idle' | 'recording' | 'stopped';
 
-export function useRecorder(getRecordingStream: () => MediaStream | null) {
+/**
+ * Encode an AudioBuffer region to a WAV blob.
+ */
+function encodeWav(buffer: AudioBuffer, start: number, end: number): Blob {
+  const sampleRate = buffer.sampleRate;
+  const startSample = Math.floor(start * sampleRate);
+  const endSample = Math.floor(end * sampleRate);
+  const numSamples = endSample - startSample;
+  const numChannels = buffer.numberOfChannels;
+  const bytesPerSample = 2; // 16-bit
+  const dataSize = numSamples * numChannels * bytesPerSample;
+  const headerSize = 44;
+  const arrayBuffer = new ArrayBuffer(headerSize + dataSize);
+  const view = new DataView(arrayBuffer);
+
+  // WAV header
+  const writeStr = (offset: number, str: string) => {
+    for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+  };
+  writeStr(0, 'RIFF');
+  view.setUint32(4, headerSize - 8 + dataSize, true);
+  writeStr(8, 'WAVE');
+  writeStr(12, 'fmt ');
+  view.setUint32(16, 16, true); // chunk size
+  view.setUint16(20, 1, true); // PCM
+  view.setUint16(22, numChannels, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * numChannels * bytesPerSample, true);
+  view.setUint16(32, numChannels * bytesPerSample, true);
+  view.setUint16(34, 16, true); // bits per sample
+  writeStr(36, 'data');
+  view.setUint32(40, dataSize, true);
+
+  // Interleave channels and write 16-bit PCM
+  const channels: Float32Array[] = [];
+  for (let ch = 0; ch < numChannels; ch++) {
+    channels.push(buffer.getChannelData(ch));
+  }
+
+  let offset = headerSize;
+  for (let i = startSample; i < endSample; i++) {
+    for (let ch = 0; ch < numChannels; ch++) {
+      const sample = Math.max(-1, Math.min(1, channels[ch][i]));
+      view.setInt16(offset, sample * 0x7fff, true);
+      offset += 2;
+    }
+  }
+
+  return new Blob([arrayBuffer], { type: 'audio/wav' });
+}
+
+export function useRecorder(
+  getRecordingStream: () => MediaStream | null,
+  getContext: () => AudioContext | null,
+) {
   const [state, setState] = useState<RecorderState>('idle');
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLooping, setIsLooping] = useState(false);
-  const [duration, setDuration] = useState(0);
+  const [recDuration, setRecDuration] = useState(0);
+  const [totalDuration, setTotalDuration] = useState(0);
+  const [trimStart, setTrimStart] = useState(0);
+  const [trimEnd, setTrimEnd] = useState(0);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [downloadFilename, setDownloadFilename] = useState('');
 
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
-  const blobRef = useRef<Blob | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const urlRef = useRef<string | null>(null);
+  const audioBufferRef = useRef<AudioBuffer | null>(null);
+  const sourceNodeRef = useRef<AudioBufferSourceNode | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval>>(undefined);
   const startTimeRef = useRef(0);
 
   const cleanup = useCallback(() => {
-    if (urlRef.current) {
-      URL.revokeObjectURL(urlRef.current);
-      urlRef.current = null;
-      setDownloadUrl(null);
+    if (downloadUrl) {
+      URL.revokeObjectURL(downloadUrl);
     }
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
+    setDownloadUrl(null);
+    if (sourceNodeRef.current) {
+      try { sourceNodeRef.current.stop(); } catch { /* ignore */ }
+      sourceNodeRef.current = null;
     }
     if (timerRef.current) {
       clearInterval(timerRef.current);
       timerRef.current = undefined;
     }
-  }, []);
+  }, [downloadUrl]);
+
+  // Regenerate download URL when trim changes
+  useEffect(() => {
+    const buf = audioBufferRef.current;
+    if (!buf || state !== 'stopped') return;
+
+    const wavBlob = encodeWav(buf, trimStart, trimEnd);
+    const url = URL.createObjectURL(wavBlob);
+    setDownloadUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return url;
+    });
+    setDownloadFilename(`wamp-recording-${Date.now()}.wav`);
+  }, [trimStart, trimEnd, state]);
 
   const startRecording = useCallback(() => {
     const stream = getRecordingStream();
@@ -40,7 +109,10 @@ export function useRecorder(getRecordingStream: () => MediaStream | null) {
 
     cleanup();
     chunksRef.current = [];
-    blobRef.current = null;
+    audioBufferRef.current = null;
+    setTrimStart(0);
+    setTrimEnd(0);
+    setTotalDuration(0);
 
     const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
       ? 'audio/webm;codecs=opus'
@@ -55,21 +127,20 @@ export function useRecorder(getRecordingStream: () => MediaStream | null) {
 
     recorder.onstop = () => {
       const blob = new Blob(chunksRef.current, { type: mimeType });
-      blobRef.current = blob;
-      const url = URL.createObjectURL(blob);
-      urlRef.current = url;
-      setDownloadUrl(url);
-      setDownloadFilename(`wamp-recording-${Date.now()}.webm`);
 
-      const audio = new Audio(url);
-      audioRef.current = audio;
+      // Decode to AudioBuffer for trimming and WAV export
+      const ctx = getContext();
+      if (ctx) {
+        blob.arrayBuffer().then((ab) => ctx.decodeAudioData(ab)).then((audioBuffer) => {
+          audioBufferRef.current = audioBuffer;
+          const dur = audioBuffer.duration;
+          setTotalDuration(dur);
+          setTrimStart(0);
+          setTrimEnd(dur);
+          setState('stopped');
+        });
+      }
 
-      audio.onended = () => {
-        if (audio.loop) return;
-        setIsPlaying(false);
-      };
-
-      setState('stopped');
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = undefined;
@@ -78,12 +149,12 @@ export function useRecorder(getRecordingStream: () => MediaStream | null) {
 
     recorder.start(100);
     startTimeRef.current = Date.now();
-    setDuration(0);
+    setRecDuration(0);
     timerRef.current = setInterval(() => {
-      setDuration(Math.floor((Date.now() - startTimeRef.current) / 1000));
+      setRecDuration(Math.floor((Date.now() - startTimeRef.current) / 1000));
     }, 200);
     setState('recording');
-  }, [getRecordingStream, cleanup]);
+  }, [getRecordingStream, getContext, cleanup]);
 
   const stopRecording = useCallback(() => {
     if (recorderRef.current && recorderRef.current.state === 'recording') {
@@ -91,48 +162,101 @@ export function useRecorder(getRecordingStream: () => MediaStream | null) {
     }
   }, []);
 
+  const toggleRecording = useCallback(() => {
+    if (state === 'recording') {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  }, [state, startRecording, stopRecording]);
+
   const togglePlayback = useCallback(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
+    const buf = audioBufferRef.current;
+    const ctx = getContext();
+    if (!buf || !ctx) return;
 
     if (isPlaying) {
-      audio.pause();
-      audio.currentTime = 0;
+      if (sourceNodeRef.current) {
+        try { sourceNodeRef.current.stop(); } catch { /* ignore */ }
+        sourceNodeRef.current = null;
+      }
       setIsPlaying(false);
-    } else {
-      audio.loop = isLooping;
-      audio.play();
-      setIsPlaying(true);
+      return;
     }
-  }, [isPlaying, isLooping]);
+
+    const playTrimmed = () => {
+      const source = ctx.createBufferSource();
+      source.buffer = buf;
+      source.connect(ctx.destination);
+      const offset = trimStart;
+      const dur = trimEnd - trimStart;
+      source.start(0, offset, dur);
+      sourceNodeRef.current = source;
+      setIsPlaying(true);
+
+      source.onended = () => {
+        if (sourceNodeRef.current !== source) return;
+        if (isLooping) {
+          playTrimmed();
+        } else {
+          sourceNodeRef.current = null;
+          setIsPlaying(false);
+        }
+      };
+    };
+
+    playTrimmed();
+  }, [getContext, isPlaying, isLooping, trimStart, trimEnd]);
 
   const toggleLoop = useCallback(() => {
-    const next = !isLooping;
-    setIsLooping(next);
-    if (audioRef.current) {
-      audioRef.current.loop = next;
-    }
-  }, [isLooping]);
+    setIsLooping((prev) => !prev);
+  }, []);
 
   const discard = useCallback(() => {
     cleanup();
-    blobRef.current = null;
+    audioBufferRef.current = null;
     chunksRef.current = [];
     setIsPlaying(false);
-    setDuration(0);
+    setRecDuration(0);
+    setTotalDuration(0);
+    setTrimStart(0);
+    setTrimEnd(0);
     setState('idle');
   }, [cleanup]);
+
+  // Hotkey: backtick (`) to toggle recording
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (e.key === '`') {
+        e.preventDefault();
+        if (state === 'recording') {
+          stopRecording();
+        } else {
+          startRecording();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [state, startRecording, stopRecording]);
 
   return {
     state,
     isPlaying,
     isLooping,
-    duration,
+    recDuration,
+    totalDuration,
+    trimStart,
+    trimEnd,
+    setTrimStart,
+    setTrimEnd,
     downloadUrl,
     downloadFilename,
     hasRecording: state === 'stopped',
     startRecording,
     stopRecording,
+    toggleRecording,
     togglePlayback,
     toggleLoop,
     discard,

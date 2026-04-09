@@ -1,6 +1,12 @@
 .recorder {
   display: flex;
   align-items: center;
+  gap: 8px;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
   gap: 4px;
 }
 
@@ -165,4 +171,69 @@
 .discardBtn:hover {
   color: #cc3333;
   border-color: #663333;
+}
+
+/* Trim section */
+.trimSection {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-left: 4px;
+  border-left: 1px solid #333;
+}
+
+.trimLabel {
+  font-size: 9px;
+  font-weight: 700;
+  color: #666;
+  letter-spacing: 0.5px;
+}
+
+.trimSlider {
+  width: 50px;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: #333;
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.trimSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10px;
+  height: 16px;
+  border-radius: 2px;
+  background: #e0c44d;
+  cursor: pointer;
+  border: none;
+}
+
+.trimSlider::-moz-range-thumb {
+  width: 10px;
+  height: 16px;
+  border-radius: 2px;
+  background: #e0c44d;
+  cursor: pointer;
+  border: none;
+}
+
+.trimTime {
+  font-size: 9px;
+  font-weight: 600;
+  color: #888;
+  font-variant-numeric: tabular-nums;
+  min-width: 30px;
+  text-align: center;
+}
+
+.trimDuration {
+  font-size: 9px;
+  font-weight: 700;
+  color: #e0c44d;
+  font-variant-numeric: tabular-nums;
+  min-width: 30px;
+  text-align: center;
 }
