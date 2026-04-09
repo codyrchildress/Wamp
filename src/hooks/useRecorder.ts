@@ -66,6 +66,7 @@ export function useRecorder(
   const [trimEnd, setTrimEnd] = useState(0);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [downloadFilename, setDownloadFilename] = useState('');
+  const [waveformPeaks, setWaveformPeaks] = useState<number[]>([]);
 
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -113,6 +114,7 @@ export function useRecorder(
     setTrimStart(0);
     setTrimEnd(0);
     setTotalDuration(0);
+    setWaveformPeaks([]);
 
     const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
       ? 'audio/webm;codecs=opus'
@@ -137,6 +139,23 @@ export function useRecorder(
           setTotalDuration(dur);
           setTrimStart(0);
           setTrimEnd(dur);
+
+          // Compute waveform peaks for visualization
+          const numPeaks = 200;
+          const channel = audioBuffer.getChannelData(0);
+          const step = Math.floor(channel.length / numPeaks);
+          const peaks: number[] = [];
+          for (let i = 0; i < numPeaks; i++) {
+            let max = 0;
+            const start = i * step;
+            const end = Math.min(start + step, channel.length);
+            for (let j = start; j < end; j++) {
+              const abs = Math.abs(channel[j]);
+              if (abs > max) max = abs;
+            }
+            peaks.push(max);
+          }
+          setWaveformPeaks(peaks);
           setState('stopped');
         });
       }
@@ -221,6 +240,7 @@ export function useRecorder(
     setTotalDuration(0);
     setTrimStart(0);
     setTrimEnd(0);
+    setWaveformPeaks([]);
     setState('idle');
   }, [cleanup]);
 
@@ -251,6 +271,7 @@ export function useRecorder(
     trimEnd,
     setTrimStart,
     setTrimEnd,
+    waveformPeaks,
     downloadUrl,
     downloadFilename,
     hasRecording: state === 'stopped',

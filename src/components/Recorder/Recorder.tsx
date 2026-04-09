@@ -1,6 +1,7 @@
 import styles from './Recorder.module.css';
 import { useRecorder } from '../../hooks/useRecorder';
 import { useAudioEngineContext } from '../../context/AudioEngineContext';
+import { Waveform } from '../Waveform/Waveform';
 
 function formatTime(seconds: number): string {
   const m = Math.floor(seconds / 60);
@@ -26,6 +27,7 @@ export function Recorder() {
     trimEnd,
     setTrimStart,
     setTrimEnd,
+    waveformPeaks,
     downloadUrl,
     downloadFilename,
     startRecording,
@@ -113,41 +115,22 @@ export function Recorder() {
         )}
       </div>
 
-      {/* Trim controls */}
-      {state === 'stopped' && totalDuration > 0 && (
+      {/* Waveform + trim */}
+      {state === 'stopped' && waveformPeaks.length > 0 && (
         <div className={styles.trimSection}>
-          <span className={styles.trimLabel}>TRIM</span>
-
-          <span className={styles.trimTime}>{formatTimePrecise(trimStart)}</span>
-          <input
-            type="range"
-            className={styles.trimSlider}
-            min={0}
-            max={totalDuration}
-            step={0.05}
-            value={trimStart}
-            onChange={(e) => {
-              const v = Number(e.target.value);
-              setTrimStart(Math.min(v, trimEnd - 0.1));
-            }}
-            title="Trim start"
+          <div className={styles.trimTimes}>
+            <span className={styles.trimTime}>{formatTimePrecise(trimStart)}</span>
+            <span className={styles.trimDuration}>{formatTimePrecise(trimmedDuration)}</span>
+            <span className={styles.trimTime}>{formatTimePrecise(trimEnd)}</span>
+          </div>
+          <Waveform
+            peaks={waveformPeaks}
+            totalDuration={totalDuration}
+            trimStart={trimStart}
+            trimEnd={trimEnd}
+            onTrimStartChange={setTrimStart}
+            onTrimEndChange={setTrimEnd}
           />
-          <input
-            type="range"
-            className={styles.trimSlider}
-            min={0}
-            max={totalDuration}
-            step={0.05}
-            value={trimEnd}
-            onChange={(e) => {
-              const v = Number(e.target.value);
-              setTrimEnd(Math.max(v, trimStart + 0.1));
-            }}
-            title="Trim end"
-          />
-          <span className={styles.trimTime}>{formatTimePrecise(trimEnd)}</span>
-
-          <span className={styles.trimDuration}>{formatTimePrecise(trimmedDuration)}</span>
         </div>
       )}
     </div>
