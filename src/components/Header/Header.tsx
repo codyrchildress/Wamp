@@ -7,6 +7,7 @@ import { Recorder } from '../Recorder/Recorder';
 import { useAudioEngineContext } from '../../context/AudioEngineContext';
 import { usePresets } from '../../hooks/usePresets';
 import type { ParamDescriptor } from '../../types/effects';
+import type { RecorderAPI } from '../../hooks/useRecorder';
 
 const masterVolumeDescriptor: ParamDescriptor = {
   name: 'master',
@@ -18,7 +19,11 @@ const masterVolumeDescriptor: ParamDescriptor = {
   unit: '%',
 };
 
-export function Header() {
+interface HeaderProps {
+  recorder: RecorderAPI;
+}
+
+export function Header({ recorder }: HeaderProps) {
   const {
     isRunning,
     start,
@@ -87,7 +92,7 @@ export function Header() {
       <div className={styles.right}>
         {isRunning && (
           <>
-            <Recorder />
+            <Recorder recorder={recorder} />
             <div className={styles.divider} />
             <LevelMeter level={inputLevel} label="IN" />
             <LevelMeter level={outputLevel} label="OUT" color="#4da6e0" />

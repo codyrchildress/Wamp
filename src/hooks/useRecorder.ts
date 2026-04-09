@@ -287,3 +287,5 @@ export function useRecorder(
     discard,
   };
 }
+
+export type RecorderAPI = ReturnType<typeof useRecorder>;

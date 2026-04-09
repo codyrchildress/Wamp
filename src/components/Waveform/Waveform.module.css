@@ -1,9 +1,9 @@
 .container {
   position: relative;
-  height: 48px;
+  height: 120px;
   cursor: col-resize;
   border-radius: 4px;
-  background: #1a1a1a;
+  background: #111;
   border: 1px solid #333;
   overflow: hidden;
   touch-action: none;
