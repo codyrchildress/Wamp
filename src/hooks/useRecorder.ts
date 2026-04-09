@@ -244,7 +244,7 @@ export function useRecorder(
     setState('idle');
   }, [cleanup]);
 
-  // Hotkey: backtick (`) to toggle recording
+  // Hotkeys: backtick (`) to toggle recording, space to play/pause
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
@@ -256,10 +256,14 @@ export function useRecorder(
           startRecording();
         }
       }
+      if (e.key === ' ' && state === 'stopped') {
+        e.preventDefault();
+        togglePlayback();
+      }
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [state, startRecording, stopRecording]);
+  }, [state, startRecording, stopRecording, togglePlayback]);
 
   return {
     state,
