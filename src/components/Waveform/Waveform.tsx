@@ -8,6 +8,7 @@ interface WaveformProps {
   trimEnd: number;
   onTrimStartChange: (v: number) => void;
   onTrimEndChange: (v: number) => void;
+  playbackPosition: number | null;
 }
 
 export function Waveform({
@@ -17,6 +18,7 @@ export function Waveform({
   trimEnd,
   onTrimStartChange,
   onTrimEndChange,
+  playbackPosition,
 }: WaveformProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -122,6 +124,12 @@ export function Waveform({
       onPointerUp={handlePointerUp}
     >
       <canvas ref={canvasRef} className={styles.canvas} />
+      {playbackPosition != null && totalDuration > 0 && (
+        <div
+          className={styles.playhead}
+          style={{ left: `${Math.min((playbackPosition / totalDuration) * 100, 100)}%` }}
+        />
+      )}
     </div>
   );
 }

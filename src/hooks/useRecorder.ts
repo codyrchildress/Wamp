@@ -74,6 +74,10 @@ export function useRecorder(
   const sourceNodeRef = useRef<AudioBufferSourceNode | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval>>(undefined);
   const startTimeRef = useRef(0);
+  const playStartCtxTimeRef = useRef(0);
+  const playStartOffsetRef = useRef(0);
+  const animFrameRef = useRef(0);
+  const [playbackPosition, setPlaybackPosition] = useState<number | null>(null);
 
   const cleanup = useCallback(() => {
     if (downloadUrl) {
@@ -88,6 +92,7 @@ export function useRecorder(
       clearInterval(timerRef.current);
       timerRef.current = undefined;
     }
+    cancelAnimationFrame(animFrameRef.current);
   }, [downloadUrl]);
 
   // Regenerate download URL when trim changes
@@ -209,6 +214,8 @@ export function useRecorder(
       source.connect(ctx.destination);
       const offset = trimStart;
       const dur = trimEnd - trimStart;
+      playStartCtxTimeRef.current = ctx.currentTime;
+      playStartOffsetRef.current = offset;
       source.start(0, offset, dur);
       sourceNodeRef.current = source;
       setIsPlaying(true);
@@ -230,6 +237,30 @@ export function useRecorder(
   const toggleLoop = useCallback(() => {
     setIsLooping((prev) => !prev);
   }, []);
+
+  // Animate playhead position during playback
+  useEffect(() => {
+    if (!isPlaying) {
+      setPlaybackPosition(null);
+      return;
+    }
+
+    const ctx = getContext();
+    if (!ctx) return;
+
+    const tick = () => {
+      const elapsed = ctx.currentTime - playStartCtxTimeRef.current;
+      const pos = playStartOffsetRef.current + elapsed;
+      setPlaybackPosition(pos);
+      animFrameRef.current = requestAnimationFrame(tick);
+    };
+
+    animFrameRef.current = requestAnimationFrame(tick);
+
+    return () => {
+      cancelAnimationFrame(animFrameRef.current);
+    };
+  }, [isPlaying, getContext]);
 
   const discard = useCallback(() => {
     cleanup();
@@ -276,6 +307,7 @@ export function useRecorder(
     setTrimStart,
     setTrimEnd,
     waveformPeaks,
+    playbackPosition,
     downloadUrl,
     downloadFilename,
     hasRecording: state === 'stopped',
