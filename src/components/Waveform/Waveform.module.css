@@ -15,3 +15,14 @@
   height: 100%;
   display: block;
 }
+
+.playhead {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #fff;
+  pointer-events: none;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
+  z-index: 1;
+}

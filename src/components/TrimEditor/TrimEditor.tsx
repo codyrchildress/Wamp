@@ -11,9 +11,10 @@ function formatTimePrecise(seconds: number): string {
 
 interface TrimEditorProps {
   recorder: RecorderAPI;
+  onSendToPad?: () => void;
 }
 
-export function TrimEditor({ recorder }: TrimEditorProps) {
+export function TrimEditor({ recorder, onSendToPad }: TrimEditorProps) {
   const {
     totalDuration,
     trimStart,
@@ -21,6 +22,7 @@ export function TrimEditor({ recorder }: TrimEditorProps) {
     setTrimStart,
     setTrimEnd,
     waveformPeaks,
+    playbackPosition,
   } = recorder;
 
   const [expanded, setExpanded] = useState(true);
@@ -54,6 +56,12 @@ export function TrimEditor({ recorder }: TrimEditorProps) {
             <span className={styles.timeTotal}>{formatTimePrecise(totalDuration)}</span>
           </div>
         )}
+
+        {expanded && onSendToPad && (
+          <button className={styles.sendToPadBtn} onClick={onSendToPad}>
+            SEND TO PAD
+          </button>
+        )}
       </div>
 
       {expanded && (
@@ -65,6 +73,7 @@ export function TrimEditor({ recorder }: TrimEditorProps) {
             trimEnd={trimEnd}
             onTrimStartChange={setTrimStart}
             onTrimEndChange={setTrimEnd}
+            playbackPosition={playbackPosition}
           />
         </div>
       )}
