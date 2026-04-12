@@ -262,6 +262,29 @@ export function useRecorder(
     };
   }, [isPlaying, getContext]);
 
+  const getTrimmedBuffer = useCallback((): AudioBuffer | null => {
+    const buf = audioBufferRef.current;
+    const ctx = getContext();
+    if (!buf || !ctx) return null;
+
+    const sr = buf.sampleRate;
+    const startSample = Math.floor(trimStart * sr);
+    const endSample = Math.floor(trimEnd * sr);
+    const length = endSample - startSample;
+    if (length <= 0) return null;
+
+    const trimmed = ctx.createBuffer(buf.numberOfChannels, length, sr);
+    for (let ch = 0; ch < buf.numberOfChannels; ch++) {
+      const src = buf.getChannelData(ch);
+      const dst = trimmed.getChannelData(ch);
+      for (let i = 0; i < length; i++) {
+        dst[i] = src[startSample + i];
+      }
+    }
+
+    return trimmed;
+  }, [getContext, trimStart, trimEnd]);
+
   const discard = useCallback(() => {
     cleanup();
     audioBufferRef.current = null;
@@ -316,6 +339,7 @@ export function useRecorder(
     toggleRecording,
     togglePlayback,
     toggleLoop,
+    getTrimmedBuffer,
     discard,
   };
 }
