@@ -10,7 +10,6 @@ export function DrumKit({ drumKit }: DrumKitProps) {
   const {
     pads,
     activePads,
-    enabled,
     setEnabled,
     isAssigning,
     triggerPad,
