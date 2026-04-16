@@ -1,0 +1,313 @@
+.seq {
+  background: linear-gradient(180deg, #1a1a1a, #141414);
+  border-top: 1px solid #222;
+  padding: 8px 16px;
+  transition: all 0.2s ease;
+}
+
+.seq.expanded {
+  border-top: 1px solid #333;
+  padding-bottom: 16px;
+}
+
+.topBar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.toggleBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 4px;
+  border: 1px solid #444;
+  background: #2a2a2a;
+  color: #888;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.toggleBtn:hover {
+  background: #363636;
+  color: #aaa;
+}
+
+.toggleBtn.on {
+  background: #1a2e28;
+  color: #4de0a6;
+  border-color: #2a6a5a;
+}
+
+.toggleDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  background: #444;
+  transition: all 0.15s ease;
+}
+
+.on .toggleDot {
+  background: #4de0a6;
+  box-shadow: 0 0 6px #4de0a6;
+}
+
+.controlGroup {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.controlLabel {
+  font-size: 10px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 24px;
+}
+
+.segmented {
+  display: flex;
+  gap: 2px;
+}
+
+.segBtn {
+  padding: 3px 10px;
+  border: 1px solid #333;
+  border-radius: 3px;
+  background: #222;
+  color: #777;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.segBtn:hover {
+  background: #2a2a2a;
+  color: #aaa;
+}
+
+.segBtn.segActive {
+  background: #1a2e28;
+  color: #4de0a6;
+  border-color: #2a6a5a;
+}
+
+.slider {
+  width: 80px;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: #333;
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #4de0a6;
+  cursor: pointer;
+  border: none;
+}
+
+.slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #4de0a6;
+  cursor: pointer;
+  border: none;
+}
+
+.bpmValue {
+  font-size: 11px;
+  font-weight: 700;
+  color: #4de0a6;
+  min-width: 28px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.octaveBtn {
+  width: 22px;
+  height: 22px;
+  border: 1px solid #333;
+  border-radius: 3px;
+  background: #222;
+  color: #999;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+}
+
+.octaveBtn:hover:not(:disabled) {
+  background: #2a2a2a;
+  color: #ddd;
+}
+
+.octaveBtn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.octaveValue {
+  font-size: 13px;
+  font-weight: 700;
+  color: #4de0a6;
+  min-width: 16px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.playBtn {
+  padding: 5px 14px;
+  border: 1px solid #2a6a5a;
+  border-radius: 3px;
+  background: #1a2e28;
+  color: #4de0a6;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.playBtn:hover {
+  background: #224035;
+}
+
+.playBtn.playing {
+  background: #3a2a1a;
+  color: #e08040;
+  border-color: #5a3a2a;
+}
+
+.clearBtn {
+  padding: 4px 10px;
+  border: 1px solid #333;
+  border-radius: 3px;
+  background: #222;
+  color: #888;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.clearBtn:hover {
+  background: #2a2a2a;
+  color: #ccc;
+}
+
+.gridWrap {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-x: auto;
+}
+
+.stepHeader,
+.row {
+  display: grid;
+  grid-template-columns: 60px repeat(16, minmax(22px, 1fr));
+  gap: 2px;
+  align-items: center;
+}
+
+.stepTick {
+  font-size: 9px;
+  font-weight: 600;
+  color: #555;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  padding: 2px 0;
+  border-radius: 2px;
+}
+
+.stepTick.beat {
+  color: #888;
+}
+
+.stepTick.cursor {
+  color: #4de0a6;
+  background: rgba(77, 224, 166, 0.1);
+}
+
+.rowLabel {
+  font-size: 10px;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding-right: 6px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cell {
+  height: 22px;
+  border: 1px solid #2a2a2a;
+  border-radius: 2px;
+  background: #1a1a1a;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.08s ease;
+}
+
+.cell:hover {
+  background: #262626;
+  border-color: #3a3a3a;
+}
+
+.cell.beatCell {
+  background: #1f1f1f;
+  border-color: #303030;
+}
+
+.cell.beatCell:hover {
+  background: #2a2a2a;
+}
+
+.cell.cellOn {
+  background: #4de0a6;
+  border-color: #6ff0bc;
+  box-shadow: 0 0 4px rgba(77, 224, 166, 0.4);
+}
+
+.cell.cellOn:hover {
+  background: #6ff0bc;
+}
+
+.cell.cellCursor {
+  outline: 1px solid #4de0a6;
+  outline-offset: -2px;
+}
+
+.cell.cellOn.cellCursor {
+  background: #fff;
+  border-color: #fff;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+}
