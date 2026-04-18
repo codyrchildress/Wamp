@@ -5,6 +5,8 @@ export class AudioEngine {
   private ctx: AudioContext | null = null;
   private stream: MediaStream | null = null;
   private sourceNode: MediaStreamAudioSourceNode | null = null;
+  private monoSplitter: ChannelSplitterNode | null = null;
+  private monoSum: GainNode | null = null;
   private inputGain: GainNode | null = null;
   private outputGain: GainNode | null = null;
   private inputAnalyser: AnalyserNode | null = null;
@@ -13,6 +15,7 @@ export class AudioEngine {
   private effects: EffectNode[] = [];
   private masterVolume = 1;
   private micMuted = false;
+  private forceMono = false;
 
   async start(deviceId?: string): Promise<void> {
     const constraints: MediaStreamConstraints = {
@@ -38,10 +41,35 @@ export class AudioEngine {
     this.outputAnalyser = this.ctx.createAnalyser();
     this.outputAnalyser.fftSize = 256;
 
-    this.sourceNode.connect(this.inputGain);
-    this.inputGain.connect(this.inputAnalyser);
+    this.monoSplitter = this.ctx.createChannelSplitter(2);
+    this.monoSum = this.ctx.createGain();
+    this.monoSum.channelCount = 1;
+    this.monoSum.channelCountMode = 'explicit';
+    this.monoSum.channelInterpretation = 'speakers';
+
+    this.connectSourceToInput();
 
     this.rebuildChain();
+  }
+
+  private connectSourceToInput(): void {
+    if (!this.sourceNode || !this.inputGain || !this.monoSplitter || !this.monoSum) return;
+    try { this.sourceNode.disconnect(); } catch { /* ignore */ }
+    try { this.monoSplitter.disconnect(); } catch { /* ignore */ }
+    try { this.monoSum.disconnect(); } catch { /* ignore */ }
+
+    if (this.micMuted) return;
+
+    if (this.forceMono) {
+      // Sum L + R into a single-channel node so a signal on only one channel
+      // plays at full volume through both output channels.
+      this.sourceNode.connect(this.monoSplitter);
+      this.monoSplitter.connect(this.monoSum, 0);
+      this.monoSplitter.connect(this.monoSum, 1);
+      this.monoSum.connect(this.inputGain);
+    } else {
+      this.sourceNode.connect(this.inputGain);
+    }
   }
 
   stop(): void {
@@ -190,18 +218,21 @@ export class AudioEngine {
     });
 
     this.sourceNode = this.ctx.createMediaStreamSource(this.stream);
-    this.sourceNode.connect(this.inputGain);
+    this.connectSourceToInput();
+  }
+
+  setForceMono(enabled: boolean): void {
+    this.forceMono = enabled;
+    this.connectSourceToInput();
+  }
+
+  getForceMono(): boolean {
+    return this.forceMono;
   }
 
   setMicMuted(muted: boolean): void {
     this.micMuted = muted;
-    if (this.sourceNode) {
-      if (muted) {
-        this.sourceNode.disconnect();
-      } else if (this.inputGain) {
-        this.sourceNode.connect(this.inputGain);
-      }
-    }
+    this.connectSourceToInput();
   }
 
   isMicMuted(): boolean {

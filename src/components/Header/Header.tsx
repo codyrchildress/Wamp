@@ -30,6 +30,8 @@ export function Header({ recorder }: HeaderProps) {
     stop,
     masterVolume,
     setMasterVolume,
+    forceMono,
+    setForceMono,
     inputLevel,
     outputLevel,
     micMuted,
@@ -73,6 +75,15 @@ export function Header({ recorder }: HeaderProps) {
             title={micMuted ? 'Unmute mic' : 'Mute mic'}
           >
             {micMuted ? 'MIC OFF' : 'MIC'}
+          </button>
+        )}
+        {isRunning && (
+          <button
+            className={`${styles.monoBtn} ${forceMono ? styles.monoOn : ''}`}
+            onClick={() => setForceMono(!forceMono)}
+            title="Sum L+R to mono (useful when guitar only comes through one channel)"
+          >
+            MONO
           </button>
         )}
       </div>

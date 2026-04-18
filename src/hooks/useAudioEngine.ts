@@ -9,6 +9,7 @@ export function useAudioEngine() {
   const [isRunning, setIsRunning] = useState(false);
   const [chain, setChain] = useState<EffectSlotState[]>([]);
   const [masterVolume, setMasterVolumeState] = useState(1);
+  const [forceMono, setForceMonoState] = useState(false);
   const [inputLevel, setInputLevel] = useState(0);
   const [outputLevel, setOutputLevel] = useState(0);
   const [micMuted, setMicMutedState] = useState(false);
@@ -28,6 +29,7 @@ export function useAudioEngine() {
 
   const start = useCallback(async (deviceId?: string) => {
     await engineRef.current.start(deviceId);
+    engineRef.current.setForceMono(forceMono);
     setIsRunning(true);
 
     // Restore last state
@@ -39,7 +41,7 @@ export function useAudioEngine() {
       }
       syncChain();
     }
-  }, [syncChain]);
+  }, [syncChain, forceMono]);
 
   const stop = useCallback(() => {
     engineRef.current.stop();
@@ -81,6 +83,11 @@ export function useAudioEngine() {
   const setMasterVolume = useCallback((value: number) => {
     engineRef.current.setMasterVolume(value);
     setMasterVolumeState(value);
+  }, []);
+
+  const setForceMono = useCallback((value: boolean) => {
+    engineRef.current.setForceMono(value);
+    setForceMonoState(value);
   }, []);
 
   const loadPresetChain = useCallback((slots: PresetEffectSlot[]) => {
@@ -131,6 +138,7 @@ export function useAudioEngine() {
     isRunning,
     chain,
     masterVolume,
+    forceMono,
     inputLevel,
     outputLevel,
     micMuted,
@@ -143,6 +151,7 @@ export function useAudioEngine() {
     setEffectParam,
     toggleBypass,
     setMasterVolume,
+    setForceMono,
     loadPresetChain,
     switchInput,
     getChainState: () => engineRef.current.getChainState(),
