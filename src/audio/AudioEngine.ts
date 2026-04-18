@@ -93,11 +93,8 @@ export class AudioEngine {
   private rebuildChain(): void {
     if (!this.ctx || !this.inputGain || !this.outputGain || !this.outputAnalyser) return;
 
-    // Disconnect everything from inputGain forward
-    this.inputGain.disconnect(this.inputAnalyser!);
-    this.inputGain.connect(this.inputAnalyser!); // keep analyser connected
-
-    // Disconnect previous chain
+    // Disconnect previous chain from inputGain forward (analyser included),
+    // then re-attach the analyser so the input meter keeps working.
     try { this.inputGain.disconnect(); } catch { /* ignore */ }
     this.inputGain.connect(this.inputAnalyser!);
 
